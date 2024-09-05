@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tea.web.mapper.DealerProductMapper">
+
+    <resultMap type="DealerProduct" id="DealerProductResult">
+            <result property="productId" column="product_id"/>
+            <result property="productName" column="product_name"/>
+            <result property="productCategory" column="product_category"/>
+            <result property="productPrice" column="product_price"/>
+            <result property="productInventory" column="product_inventory"/>
+            <result property="dealerId" column="dealer_id"/>
+            <result property="productDelete" column="product_delete"/>
+            <result property="createDate" column="create_date"/>
+            <result property="updateDate" column="update_date"/>
+            <result property="params.shopName" column="shop_name"/>
+            <result property="params.shopId" column="shop_id"/>
+    </resultMap>
+
+    <sql id="selectDealerProductVo">
+        select product_id, product_name, product_category, product_price, product_inventory, dealer_id, product_delete, dp.create_date, dp.update_date ,ds.shop_name,ds.shop_id
+        from dealer_product as dp INNER JOIN dealer_shop as ds ON dp.dealer_id =ds.shop_id
+    </sql>
+
+    <select id="selectDealerProductList" parameterType="DealerProduct" resultMap="DealerProductResult">
+        <include refid="selectDealerProductVo"/>
+        <where>
+                        <if test="productName != null  and productName != ''">
+                            and product_name like concat('%', #{productName}, '%')
+                        </if>
+                        <if test="productCategory != null ">
+                            and product_category = #{productCategory}
+                        </if>
+                        <if test="productPrice != null ">
+                            and product_price = #{productPrice}
+                        </if>
+                        <if test="productInventory != null ">
+                            and product_inventory = #{productInventory}
+                        </if>
+                        <if test="dealerId != null ">
+                            and dealer_id = #{dealerId}
+                        </if>
+                        <if test="productDelete != null ">
+                            and product_delete = #{productDelete}
+                        </if>
+                        <if test="createDate != null ">
+                            and create_date = #{createDate}
+                        </if>
+                        <if test="updateDate != null ">
+                            and update_date = #{updateDate}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectDealerProductByProductId" parameterType="String"
+            resultMap="DealerProductResult">
+            <include refid="selectDealerProductVo"/>
+            where product_id = #{productId}
+    </select>
+
+    <insert id="insertDealerProduct" parameterType="DealerProduct">
+        insert into dealer_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="productId != null">product_id,
+                    </if>
+                    <if test="productName != null">product_name,
+                    </if>
+                    <if test="productCategory != null">product_category,
+                    </if>
+                    <if test="productPrice != null">product_price,
+                    </if>
+                    <if test="productInventory != null">product_inventory,
+                    </if>
+                    <if test="dealerId != null">dealer_id,
+                    </if>
+                    <if test="productDelete != null">product_delete,
+                    </if>
+                    <if test="createDate != null">create_date,
+                    </if>
+                    <if test="updateDate != null">update_date,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="productId != null">#{productId},
+                    </if>
+                    <if test="productName != null">#{productName},
+                    </if>
+                    <if test="productCategory != null">#{productCategory},
+                    </if>
+                    <if test="productPrice != null">#{productPrice},
+                    </if>
+                    <if test="productInventory != null">#{productInventory},
+                    </if>
+                    <if test="dealerId != null">#{dealerId},
+                    </if>
+                    <if test="productDelete != null">#{productDelete},
+                    </if>
+                    <if test="createDate != null">#{createDate},
+                    </if>
+                    <if test="updateDate != null">#{updateDate},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateDealerProduct" parameterType="DealerProduct">
+        update dealer_product
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="productName != null">product_name =
+                        #{productName},
+                    </if>
+                    <if test="productCategory != null">product_category =
+                        #{productCategory},
+                    </if>
+                    <if test="productPrice != null">product_price =
+                        #{productPrice},
+                    </if>
+                    <if test="productInventory != null">product_inventory =
+                        #{productInventory},
+                    </if>
+                    <if test="dealerId != null">dealer_id =
+                        #{dealerId},
+                    </if>
+                    <if test="productDelete != null">product_delete =
+                        #{productDelete},
+                    </if>
+                    <if test="createDate != null">create_date =
+                        #{createDate},
+                    </if>
+                    <if test="updateDate != null">update_date =
+                        #{updateDate},
+                    </if>
+        </trim>
+        where product_id = #{productId}
+    </update>
+
+    <delete id="deleteDealerProductByProductId" parameterType="String">
+        delete from dealer_product where product_id = #{productId}
+    </delete>
+
+    <delete id="deleteDealerProductByProductIds" parameterType="String">
+        delete from dealer_product where product_id in
+        <foreach item="productId" collection="array" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </delete>
+
+</mapper>

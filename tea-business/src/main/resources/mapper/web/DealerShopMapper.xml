@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tea.web.mapper.DealerShopMapper">
+
+    <resultMap type="DealerShop" id="DealerShopResult">
+            <result property="shopId" column="shop_id"/>
+            <result property="shopName" column="shop_name"/>
+            <result property="shopAddress" column="shop_address"/>
+            <result property="shopDescription" column="shop_description"/>
+            <result property="shopState" column="shop_state"/>
+            <result property="userId" column="user_id"/>
+            <result property="createDate" column="create_date"/>
+            <result property="updateDate" column="update_date"/>
+        <!-- 使用collection标签实现一对多的关联映射 -->
+        <collection property="dealerShopPicture" ofType="DealerShopPicture"  >
+            <id property="id" column="id"/>
+            <result property="dealerId" column="dealer_id"/>
+            <result property="pictureFileId" column="picture_file_id"/>
+            <result property="pictureDescription" column="picture_description"/>
+            <result property="pictureSort" column="picture_sort"/>
+            <result property="createDate" column="dsp_create_date" />
+            <result property="updateDate" column="dsp_update_date"/>
+            <result property="sysAttachment.fileName" column="file_name"/>
+            <result property="sysAttachment.filePath" column="file_path"/>
+            <result property="sysAttachment.fileExt" column="file_ext"/>
+        </collection>
+    </resultMap>
+
+    <sql id="selectDealerShopVo">
+        select shop_id, shop_name, shop_address, shop_description, shop_state, user_id, create_date, update_date
+        from dealer_shop
+    </sql>
+
+    <select id="selectDealerShopList" parameterType="DealerShop" resultMap="DealerShopResult">
+        <include refid="selectDealerShopVo"/>
+        <where>
+                        <if test="shopName != null  and shopName != ''">
+                            and shop_name like concat('%', #{shopName}, '%')
+                        </if>
+                        <if test="shopAddress != null  and shopAddress != ''">
+                            and shop_address like concat('%', #{shopAddress}, '%')
+                        </if>
+                        <if test="shopDescription != null  and shopDescription != ''">
+                            and shop_description = #{shopDescription}
+                        </if>
+                        <if test="shopState != null ">
+                            and shop_state = #{shopState}
+                        </if>
+                        <if test="userId != null  and userId != ''">
+                            and user_id = #{userId}
+                        </if>
+                        <if test="createDate != null ">
+                            and create_date = #{createDate}
+                        </if>
+                        <if test="updateDate != null ">
+                            and update_date = #{updateDate}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectDealerShopByShopId" parameterType="Long"
+            resultMap="DealerShopResult">
+            <include refid="selectDealerShopVo"/>
+            where shop_id = #{shopId}
+    </select>
+
+    <insert id="insertDealerShop" parameterType="DealerShop" useGeneratedKeys="true"
+            keyProperty="shopId">
+        insert into dealer_shop
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="shopName != null">shop_name,
+                    </if>
+                    <if test="shopAddress != null">shop_address,
+                    </if>
+                    <if test="shopDescription != null">shop_description,
+                    </if>
+                    <if test="shopState != null">shop_state,
+                    </if>
+                    <if test="userId != null">user_id,
+                    </if>
+                    <if test="createDate != null">create_date,
+                    </if>
+                    <if test="updateDate != null">update_date,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="shopName != null">#{shopName},
+                    </if>
+                    <if test="shopAddress != null">#{shopAddress},
+                    </if>
+                    <if test="shopDescription != null">#{shopDescription},
+                    </if>
+                    <if test="shopState != null">#{shopState},
+                    </if>
+                    <if test="userId != null">#{userId},
+                    </if>
+                    <if test="createDate != null">#{createDate},
+                    </if>
+                    <if test="updateDate != null">#{updateDate},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateDealerShop" parameterType="DealerShop">
+        update dealer_shop
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="shopName != null">shop_name =
+                        #{shopName},
+                    </if>
+                    <if test="shopAddress != null">shop_address =
+                        #{shopAddress},
+                    </if>
+                    <if test="shopDescription != null">shop_description =
+                        #{shopDescription},
+                    </if>
+                    <if test="shopState != null">shop_state =
+                        #{shopState},
+                    </if>
+                    <if test="userId != null">user_id =
+                        #{userId},
+                    </if>
+                    <if test="createDate != null">create_date =
+                        #{createDate},
+                    </if>
+                    <if test="updateDate != null">update_date =
+                        #{updateDate},
+                    </if>
+        </trim>
+        where shop_id = #{shopId}
+    </update>
+
+    <delete id="deleteDealerShopByShopId" parameterType="Long">
+        delete from dealer_shop where shop_id = #{shopId}
+    </delete>
+
+    <delete id="deleteDealerShopByShopIds" parameterType="String">
+        delete from dealer_shop where shop_id in
+        <foreach item="shopId" collection="array" open="(" separator="," close=")">
+            #{shopId}
+        </foreach>
+    </delete>
+
+    <select id="selectDealerShopAndPictureList" parameterType="DealerShop" resultMap="DealerShopResult">
+        SELECT
+        ds.shop_id,
+        ds.shop_name,
+        ds.shop_address,
+        ds.shop_description,
+        ds.shop_state,
+        ds.user_id,
+        ds.create_date,
+        ds.update_date ,
+        dsp.id,
+        dsp.dealer_id,
+        dsp.picture_description,
+        dsp.picture_file_id,
+        dsp.picture_sort,
+        dsp.create_date as dsp_create_date,
+        dsp.update_date as dsp_update_date,
+        sa.file_name,
+        sa.file_path,
+        sa.file_ext
+        FROM
+        dealer_shop ds
+        LEFT JOIN dealer_shop_picture dsp
+        ON ds.shop_id = dsp.dealer_id
+        LEFT JOIN sys_attachment sa
+        on dsp.picture_file_id = sa.file_id
+        <where>
+            <if test="shopId != null  and shopId != ''">
+                and shop_id = #{shopId}
+            </if>
+            <if test="shopName != null  and shopName != ''">
+                and shop_name like concat('%', #{shopName}, '%')
+            </if>
+            <if test="shopAddress != null  and shopAddress != ''">
+                and shop_address like concat('%', #{shopAddress}, '%')
+            </if>
+            <if test="shopDescription != null  and shopDescription != ''">
+                and shop_description = #{shopDescription}
+            </if>
+            <if test="shopState != null ">
+                and shop_state = #{shopState}
+            </if>
+            <if test="userId != null  and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="createDate != null ">
+                and create_date = #{createDate}
+            </if>
+            <if test="updateDate != null ">
+                and update_date = #{updateDate}
+            </if>
+        </where>
+        order by shop_id, dsp.picture_sort
+    </select>
+
+</mapper>

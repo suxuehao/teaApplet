@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--360浏览器优先以webkit内核解析-->
+    <title>茶云盟</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link href="../static/css/font-awesome.min.css" th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+    <link href="../static/css/style.min.css" th:href="@{/css/style.min.css}" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-4" th:each="item:${dealerShopAndPicture}">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <span class="label label-primary pull-right">NEW</span>
+                    <h5 th:text="${item.shopName}"></h5>
+                </div>
+                <div class="ibox-content">
+                    <h4>店铺概况图</h4>
+                    <p>
+
+                    </p>
+                    <p>
+                        <th:block th:if="${item.dealerShopPicture.size()>0}">
+                            <!--<th:block th:if="${sys.sysAttachment.fileExt=='mp4'}" th:each="sys:${item.dealerShopPicture}">
+                                <video  class="list-view" controls muted autoplay  >
+                                    <source th:src="${sys.sysAttachment.filePath}" type="video/mp4">
+                                </video>
+                            </th:block>-->
+                        <th:block th:if="${sys.sysAttachment.fileExt!='mp4'}" th:each="sys:${item.dealerShopPicture}">
+                            <img  th:onclick="viewImgFilePath([[${sys.sysAttachment.filePath}]],300,350)" style="width: 100px; height: 100px;margin-right: 2px;"  th:src="${sys.sysAttachment.filePath}" class="list-upload-img">
+                        </th:block>
+                        </th:block>
+                        <th:block th:if="${item.dealerShopPicture.size()==0}">
+                            <img style="width: 100px; height: 100px;" th:onclick="viewImgFilePath([[@{/img/no_picture.png}]],300,350)"  th:src="@{/img/no_picture.png}">
+                        </th:block>
+                    </p>
+                    <div>
+                        <span th:text="${item.shopDescription}"></span>
+                        <!--<div class="stat-percent">48%</div>-->
+                        <div class="progress progress-mini">
+                            <div style="width: 48%;" class="progress-bar"></div>
+                        </div>
+                    </div>
+                    <div class="row  m-t-sm">
+                        <div class="col-sm-4">
+                            <div class="font-bold">已成交数</div>
+                            12
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="font-bold">店铺地址</div>
+                            <label style="font-weight: normal;" th:text="${item.shopAddress}"></label>
+                        </div>
+                        <div class="col-sm-4 text-right">
+                            <div class="font-bold">售价</div>
+                            &yen;200,913 <i class="fa fa-level-up text-navy"></i>
+                        </div>
+                    </div>
+                    <div class="row  m-t-sm">
+                        <div class="col-sm-3 ">
+                            <a onclick="pictureDetail(this)" th:data-shopid="${item.shopId}"   class="btn btn-warning">
+                                <i class="glyphicon glyphicon-lock"> </i> 去采购商品
+                            </a>
+                        </div>
+                        <div class="col-sm-3">
+                            <a class="btn btn-success btn-outline"  onclick="goToChat(this)" th:data-shopid="${item.shopId}">
+                                <i class="glyphicon glyphicon-user"> </i> 联系客服
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <button id="open" onclick="openSocket('ws://localhost:8081/webSocket/')">连接websocket</button>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<!--<form id="task">
+    <h4 class="form-header h4">取号</h4>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">姓名：</label>
+                <div class="col-sm-8">
+                    <input name="name" class="form-control" type="text" >
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">年龄：</label>
+                <div class="col-sm-8">
+                    <input name="age" class="form-control" type="number" >
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="form-group">
+            <div class="col-sm-8">
+                <input value="取号" id="qu"  type="button" >
+            </div>
+        </div>
+    </div>
+</div>
+    <h4 class="form-header h4">叫号</h4>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">姓名：</label>
+                <div class="col-sm-8">
+                    <label id="jiaoname"></label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">年龄：</label>
+                <div class="col-sm-8">
+                   <label id="jiaoage"></label>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="form-group">
+            <div class="col-sm-8">
+                <input value="叫号" id="jiao"  type="button" >
+            </div>
+        </div>
+    </div>
+</div>-->
+<div id="placeholder"></div>
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+<script th:src="@{/js/main/main.js}"></script>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var  userName = [[${user.userName}]];
+    var  userId = [[${user.userId}]];
+    $("#qu").click(function (){
+        $.ajax({
+            url:"/web/task/add",
+            type: "post",
+            data: $("#task").serialize(),
+            success: function (data) {
+                if (data.code == 0) {
+                    layer.msg(data.msg);
+                    $("#task")[0].reset();
+                } else {
+                    layer.msg(data.msg);
+                }
+            }
+        });
+    })
+
+    $("#jiao").click(function (){
+        $.ajax({
+            url:"/web/task/queue",
+            type: "get",
+            success: function (data) {
+                if (data.code == 0){
+                    if (data.data != null) {
+                        var name = data.data.name;
+                        var age = data.data.age;
+                        console.log(name)
+                        $("#jiaoname").text(name);
+                        $("#jiaoage").text(age);
+                    } else {
+                        layer.msg("队列为空！！！");
+                        console.log(data)
+                    }
+                }else {
+                    layer.msg(data.msg);
+                }
+
+            }
+        });
+    })
+
+    //1、请求获取用户通知权限
+    document.addEventListener('DOMContentLoaded', (event) => {
+        if (Notification.permission === 'default') {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    // 权限请求成功，发送通知
+                    sendNotification();
+                }
+            }).catch(error => {
+                console.error('请求通知权限失败:', error);
+            });
+        } else if (Notification.permission === 'granted') {
+            // 用户已授予权限，直接发送通知
+            //sendNotification();
+        }
+    });
+
+    //2、发送通知
+    /*function sendNotification() {
+        const title = '通知标题';
+        const options = {
+            body: '这是通知的正文内容。',
+            icon: 'https://example.com/icon.png', // 可选，通知的图标
+            badge: 'https://example.com/badge.png' // 可选，通知的徽标
+        };
+
+        // 创建并显示通知
+        new Notification(title, options);
+    }*/
+
+    //3、页面加载完成发送通知
+    window.onload = function() {
+        if (Notification.permission === 'default') {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    sendNotification();
+                }
+            }).catch(error => {
+                console.error('请求通知权限失败:', error);
+            });
+        } else if (Notification.permission === 'granted') {
+            const title = '亲爱的：'+userName;
+            const options = {
+                body: '嘿，欢迎踏入‘茶香四溢，乐购不停’的神奇茶界系统！在这里，每一片茶叶都藏着故事，每一次点击都能开启一场味蕾的探险。不只是购物，更是一场关于茶文化的趣味之旅。',
+                icon: 'https://example.com/icon.png', // 可选，通知的图标
+                badge: 'https://example.com/badge.png' // 可选，通知的徽标
+            };
+            // 创建并显示通知
+            new Notification(title, options);
+        }
+    };
+
+    function openSocket(url){
+        webSocket = new WebSocket(url+userName);
+        webSocket.onopen = function(event){
+            alert('连接成功'+userName)
+        }
+    }
+    //以标签页的方式打开店铺详细商品
+    function pictureDetail(element){
+        //获取标签的data-shopId属性值
+        const shopId = element.dataset.shopid;
+        if (shopId) {
+            // 打开新标签页
+           $.modal.openTab("店铺商品详情", "/web/picture/productDetails?shopId=" + shopId)
+        } else {
+            $.modal.alertError("shopId参数错误");
+        }
+    }
+
+    //聊天页面
+    function goToChat(element){
+        //获取标签的data-shopId属性值
+        const shopId = element.dataset.shopid;
+        if (shopId){
+            $.modal.openTab("咨询商家", "/web/consult/consultChat?shopId=" + shopId+"&userId="+userId+"&userName="+userName)
+        }
+    }
+</script>
+</body>
+</html>

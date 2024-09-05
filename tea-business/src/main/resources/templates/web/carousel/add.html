@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增首页轮播')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+    <th:block th:include="include :: jasny-bootstrap-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-carousel-add">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">首页轮播图名称
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="lbPictureName" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12" style="margin-left:200px; ">
+                                <div class="fileinput fileinput-new " data-provides="fileinput">
+                                    <div class="fileinput-preview thumbnail" data-trigger="fileinput"
+                                         style="width: 200px; height: 150px;"></div>
+                                    <div>
+                                <span class="btn btn-white btn-file"><span class="fileinput-new">选择图片</span><span
+                                        class="fileinput-exists">更改</span><input name="lbFile" id="lbFile" type="file"></span>
+                                        <a href="javascript:;" class="btn btn-white fileinput-exists" data-dismiss="fileinput">清除</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">创建时间
+                                ：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group date">
+                                    <input name="lbCreateTime" class="form-control" placeholder="yyyy-MM-dd"
+                                           type="text">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">是否可用
+                                ：</label>
+                            <div class="col-sm-8">
+                                <label class="toggle-switch switch-solid">
+                                    <input id="lbIsUse" name="lbIsUse" type="checkbox" value="1" checked="checked"> <span></span>
+                                </label>
+                            </div>
+                        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<th:block th:include="include :: jasny-bootstrap-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "web/carousel"
+    $("#form-carousel-add").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        var is = true;
+        var formData = new FormData();
+        // 获取表单数据并添加到 FormData 对象中
+        var serializedData = $('#form-carousel-add').serializeArray();
+        $.each(serializedData, function(index, lbHomeCarousel) {
+            formData.append(lbHomeCarousel.name, lbHomeCarousel.value);
+        });
+        if ($('#lbFile')[0].files[0] == null) {
+            $.modal.alertWarning("请先选择文件路径");
+            return false;
+        }
+        formData.append('file', $('#lbFile')[0].files[0]);
+        if (is){
+            is =false;
+            $.ajax({
+                url: prefix + "/add",
+                type: 'post',
+                cache: false,
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: "json",
+                success: function(result) {
+                    is = true
+                    $.operate.successCallback(result);
+                },
+                error: function() {
+                    is = true
+                    // 请求失败时也要将 is 设置为 true，以允许再次提交
+                    $.modal.alertError("请求失败，请重试");
+                },
+                complete: function() {
+                    // 请求完成后启用提交按钮
+                    is = true
+                    $('#submitButton').prop('disabled', false);
+                }
+            });
+        }
+    }
+
+            $("input[name='lbCreateTime']").datetimepicker({
+                format: "yyyy-mm-dd",
+                minView: "month",
+                autoclose: true
+            });
+    $("#lbIsUse").click(() => {
+        if ($(this).prop('checked')){
+            $(this).prop('checked',false);
+            $("#lbIsUse").val('0');
+        }else{
+            $(this).prop('checked',true);
+            $("#lbIsUse").val('1');
+        }
+
+    })
+
+</script>
+</body>
+</html>

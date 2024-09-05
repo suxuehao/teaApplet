@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增订单')"/>
+            <th:block th:include="include :: datetimepicker-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-orders-add">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">用户id
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="userId" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">经销商店铺id
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="dealerShopId" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">购买商品数量
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="orderNum" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">订单状态(1：新建,:2：待支付,:3：已发货,:4：完成)
+                                ：</label>
+                            <div class="col-sm-8">
+                                <select name="orderState" class="form-control m-b"
+                                        th:with="type=${@dict.getType('order_state')}">
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                            th:value="${dict.dictValue}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">创建时间
+                                ：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group date">
+                                    <input name="createDate" class="form-control" placeholder="yyyy-MM-dd"
+                                           type="text">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">修改时间
+                                ：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group date">
+                                    <input name="updateDate" class="form-control" placeholder="yyyy-MM-dd"
+                                           type="text">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+        <th:block th:include="include :: datetimepicker-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "web/orders"
+    $("#form-orders-add").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/add", $('#form-orders-add').serialize());
+        }
+    }
+
+            $("input[name='createDate']").datetimepicker({
+                format: "yyyy-mm-dd",
+                minView: "month",
+                autoclose: true
+            });
+
+            $("input[name='updateDate']").datetimepicker({
+                format: "yyyy-mm-dd",
+                minView: "month",
+                autoclose: true
+            });
+</script>
+</body>
+</html>

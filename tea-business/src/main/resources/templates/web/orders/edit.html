@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('修改订单')"/>
+            <th:block th:include="include :: datetimepicker-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-orders-edit" th:object="${orders}">
+        <input name="orderId" th:field="*{orderId}" type="hidden">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">用户id
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="userId" th:field="*{userId}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">经销商店铺id
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="dealerShopId" th:field="*{dealerShopId}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">购买商品数量
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="orderNum" th:field="*{orderNum}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">订单状态(1：新建,:2：待支付,:3：已发货,:4：完成)
+                                ：</label>
+                            <div class="col-sm-8">
+                                <select name="orderState" class="form-control m-b"
+                                        th:with="type=${@dict.getType('order_state')}">
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                            th:value="${dict.dictValue}" th:field="*{orderState}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">创建时间
+                                ：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group date">
+                                    <input name="createDate"
+                                           th:value="${#dates.format(orders.createDate, 'yyyy-MM-dd')}"
+                                           class="form-control" placeholder="yyyy-MM-dd"
+                                           type="text">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">修改时间
+                                ：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group date">
+                                    <input name="updateDate"
+                                           th:value="${#dates.format(orders.updateDate, 'yyyy-MM-dd')}"
+                                           class="form-control" placeholder="yyyy-MM-dd"
+                                           type="text">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+        <th:block th:include="include :: datetimepicker-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "web/orders";
+    $("#form-orders-edit").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/edit", $('#form-orders-edit').serialize());
+        }
+    }
+
+            $("input[name='createDate']").datetimepicker({
+                format: "yyyy-mm-dd",
+                minView: "month",
+                autoclose: true
+            });
+
+            $("input[name='updateDate']").datetimepicker({
+                format: "yyyy-mm-dd",
+                minView: "month",
+                autoclose: true
+            });
+</script>
+</body>
+</html>

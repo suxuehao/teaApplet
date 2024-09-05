@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('文件附件列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                                    <li>
+                                        <label>文件加密UUID：</label>
+                                        <input type="text" name="fileId"/>
+                                    </li>
+                                    <li>
+                                        <label>文件名称：</label>
+                                        <input type="text" name="fileName"/>
+                                    </li>
+                                    <li>
+                                        <label>文件路径：</label>
+                                        <input type="text" name="filePath"/>
+                                    </li>
+                                    <li>
+                                        <label>文件大小：</label>
+                                        <input type="text" name="fileSize"/>
+                                    </li>
+                                    <li>
+                                        <label>文件扩展名：</label>
+                                        <input type="text" name="fileExt"/>
+                                    </li>
+                                    <li>
+                                        <label>上传时间：</label>
+                                        <input type="text" class="time-input" placeholder="请选择上传时间"
+                                               name="uploadTime"/>
+                                    </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="web:attachment:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary single disabled" onclick="$.operate.edit()"
+               shiro:hasPermission="web:attachment:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="web:attachment:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="web:attachment:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('web:attachment:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('web:attachment:remove')}]];
+    var prefix = ctx + "web/attachment";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "文件附件",
+            columns: [{
+                checkbox: true
+            },
+                        {
+                            field: 'id',
+                            title: '主键id',
+                            visible: false
+                        },
+                        {
+                            field: 'fileId',
+                            title: '文件加密UUID'
+                        },
+                        {
+                            field: 'fileName',
+                            title: '文件名称'
+                        },
+                        {
+                            field: 'filePath',
+                            title: '文件路径'
+                        },
+                        {
+                            field: 'fileSize',
+                            title: '文件大小'
+                        },
+                        {
+                            field: 'fileExt',
+                            title: '文件扩展名'
+                        },
+                        {
+                            field: 'uploadTime',
+                            title: '上传时间'
+                        },
+                        {
+                            field: 'sysType',
+                            title: '文件上传类型'
+                        },
+                        {
+                            field: 'state',
+                            title: '文件状态'
+                        },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

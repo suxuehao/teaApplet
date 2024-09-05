@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('修改店铺商品对应的附件图片')"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content  animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <h3>商品展示图片</h3>
+                    <p class="small"><i class="fa fa-hand-o-down"></i> 在列表之间拖动列表排序</p>
+                    <ul class="sortable-list connectList agile-list">
+                        <li th:each="sys:${dealerProductPictures}" class="success-element">
+                            <input type="hidden" th:value="${sys.id}" name="pictureId">
+                            <img th:onclick="viewImgFilePath([[${sys.sysAttachments.filePath}]],300,350)" style="width: 100px; height: 100px;" th:src="${sys.sysAttachments.filePath}" class="list-upload-img">
+                            <div class="agile-detail">
+                                <span class="pull-right btn btn-xs btn-white" th:text="${sys.sort}"></span>
+                                <i class="fa fa-clock-o"></i> <span th:text="${'修改时间：'+#dates.format(sys.updateTime)==null?'':#dates.format(sys.updateTime)}"></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<th:block th:include="include :: footer"/>
+<script th:src="@{/js/jquery-ui-1.10.4.min.js}"></script>
+<script th:inline="javascript">
+    var prefix = ctx + "web/productPicture";
+    var sort = [];
+
+    $("#form-picture-edit").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if (sort.length < 1) {
+            $.modal.alertWarning("未调整排序!");
+            return;
+        }
+        $.ajax({
+            url: prefix + "/edit",
+            type: 'post',
+            contentType: 'application/json',  // 设置内容类型为 JSON
+            data: JSON.stringify(sort),       // 直接发送 JSON 数据
+            success: function(result) {
+                $.operate.successCallback(result);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $(".sortable-list").sortable({
+            connectWith: ".connectList",
+            deactivate: function() {
+                sort=[];
+                var li = $(".success-element");
+                li.each(function(index) {
+                    var pictureId = $(this).find("input[name='pictureId']").val();
+                    var pictureSort = index + 1;
+                    sort.push({ pictureId: pictureId, pictureSort: pictureSort });
+                });
+            }
+        }).disableSelection();
+    });
+</script>
+</html>

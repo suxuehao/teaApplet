@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tea.web.mapper.DealerProductPictureMapper">
+
+    <resultMap type="DealerProductPicture" id="DealerProductPictureResult">
+            <result property="id" column="id"/>
+            <result property="dealerProductId" column="dealer_product_id"/>
+            <result property="productFileId" column="product_file_id"/>
+            <result property="sort" column="sort"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+        <association property="sysAttachments" javaType="SysAttachment">
+            <result property="fileId" column="file_id"/>
+            <result property="fileName" column="file_name"/>
+            <result property="filePath" column="file_path"/>
+            <result property="fileSize" column="file_size"/>
+            <result property="fileExt" column="file_ext"/>
+        </association>
+    </resultMap>
+
+    <sql id="selectDealerProductPictureVo">
+        select id, dealer_product_id, product_file_id, sort, create_time, update_time
+        from dealer_product_picture
+    </sql>
+
+    <select id="selectDealerProductPictureList" parameterType="DealerProductPicture" resultMap="DealerProductPictureResult">
+        <include refid="selectDealerProductPictureVo"/>
+        <where>
+                        <if test="dealerProductId != null  and dealerProductId != ''">
+                            and dealer_product_id = #{dealerProductId}
+                        </if>
+                        <if test="productFileId != null  and productFileId != ''">
+                            and product_file_id = #{productFileId}
+                        </if>
+                        <if test="sort != null ">
+                            and sort = #{sort}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectDealerProductPictureAndSysAttachmentList" parameterType="DealerProductPicture" resultMap="DealerProductPictureResult">
+        select dpp.id, dpp.dealer_product_id, dpp.product_file_id, dpp.sort, dpp.create_time, dpp.update_time,sa.file_id,sa.file_name,sa.file_path,sa.file_size,sa.file_ext
+        from dealer_product_picture dpp INNER JOIN sys_attachment sa
+        ON dpp.product_file_id = sa.file_id
+        <where>
+            <if test="dealerProductId != null  and dealerProductId != ''">
+                and dealer_product_id = #{dealerProductId}
+            </if>
+            <if test="productFileId != null  and productFileId != ''">
+                and product_file_id = #{productFileId}
+            </if>
+            <if test="sort != null ">
+                and sort = #{sort}
+            </if>
+        </where>
+        order by dpp.dealer_product_id,dpp.sort
+    </select>
+
+    <select id="selectDealerProductPictureById" parameterType="Long"
+            resultMap="DealerProductPictureResult">
+            <include refid="selectDealerProductPictureVo"/>
+            where id = #{id}
+    </select>
+
+    <insert id="insertDealerProductPicture" parameterType="DealerProductPicture" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into dealer_product_picture
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="dealerProductId != null and dealerProductId != ''">dealer_product_id,
+                    </if>
+                    <if test="productFileId != null and productFileId != ''">product_file_id,
+                    </if>
+                    <if test="sort != null">sort,
+                    </if>
+                    <if test="createTime != null">create_time,
+                    </if>
+                    <if test="updateTime != null">update_time,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="dealerProductId != null and dealerProductId != ''">#{dealerProductId},
+                    </if>
+                    <if test="productFileId != null and productFileId != ''">#{productFileId},
+                    </if>
+                    <if test="sort != null">#{sort},
+                    </if>
+                    <if test="createTime != null">#{createTime},
+                    </if>
+                    <if test="updateTime != null">#{updateTime},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateDealerProductPicture" parameterType="DealerProductPicture">
+        update dealer_product_picture
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="dealerProductId != null and dealerProductId != ''">dealer_product_id =
+                        #{dealerProductId},
+                    </if>
+                    <if test="productFileId != null and productFileId != ''">product_file_id =
+                        #{productFileId},
+                    </if>
+                    <if test="sort != null">sort =
+                        #{sort},
+                    </if>
+                    <if test="createTime != null">create_time =
+                        #{createTime},
+                    </if>
+                    <if test="updateTime != null">update_time =
+                        #{updateTime},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDealerProductPictureById" parameterType="Long">
+        delete from dealer_product_picture where id = #{id}
+    </delete>
+
+    <delete id="deleteDealerProductPictureByIds" parameterType="String">
+        delete from dealer_product_picture where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="BatchInsertDealerProductPicture">
+        insert into dealer_product_picture(
+        dealer_product_id,
+        product_file_id,
+        sort,
+        create_time,
+        update_time
+        )
+        <foreach item="item" index="index" collection="dealerProductPictureList"
+                 open="values (" separator="),(" close=")">
+            #{item.dealerProductId},
+            #{item.productFileId},
+            #{item.sort},
+            #{item.createTime},
+            #{item.updateTime}
+        </foreach>
+    </insert>
+
+</mapper>

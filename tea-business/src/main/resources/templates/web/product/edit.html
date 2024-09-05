@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('修改经销商商品管理')"/>
+            <th:block th:include="include :: datetimepicker-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-product-edit" th:object="${dealerProduct}">
+        <input name="productId" th:field="*{productId}" type="hidden">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">商品名称
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="productName" th:field="*{productName}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">商品单价
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="productPrice" th:field="*{productPrice}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">商品库存
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="productInventory" th:field="*{productInventory}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">所属店铺
+                                ：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="dealerId">
+                                    <option th:each="dealer:${dealerShop}" th:selected="${dealerProduct.dealerId == dealer.shopId}" th:text="${dealer.shopName}" th:value="${dealer.shopId}"></option>
+                                </select>
+<!--                                <input name="dealerId" th:field="*{dealerId}" class="form-control"-->
+<!--                                       type="text">-->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">商品状态(0:删除,1:正常,2:已下架)
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input name="productDelete" th:field="*{productDelete}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">创建时间
+                                ：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group date">
+                                    <input name="createDate"
+                                           th:value="${#dates.format(dealerProduct.createDate, 'yyyy-MM-dd')}"
+                                           class="form-control" placeholder="yyyy-MM-dd"
+                                           type="text">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">修改时间
+                                ：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group date">
+                                    <input name="updateDate"
+                                           th:value="${#dates.format(dealerProduct.updateDate, 'yyyy-MM-dd')}"
+                                           class="form-control" placeholder="yyyy-MM-dd"
+                                           type="text">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+        <th:block th:include="include :: datetimepicker-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "web/product";
+    $("#form-product-edit").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/edit", $('#form-product-edit').serialize());
+        }
+    }
+
+            $("input[name='createDate']").datetimepicker({
+                format: "yyyy-mm-dd",
+                minView: "month",
+                autoclose: true
+            });
+
+            $("input[name='updateDate']").datetimepicker({
+                format: "yyyy-mm-dd",
+                minView: "month",
+                autoclose: true
+            });
+</script>
+</body>
+</html>

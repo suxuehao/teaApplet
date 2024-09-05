@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tea.web.mapper.OrdersMapper">
+
+    <resultMap type="Orders" id="OrdersResult">
+            <result property="orderId" column="order_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="dealerShopId" column="dealer_shop_id"/>
+            <result property="productId" column="product_id"/>
+            <result property="orderNum" column="order_num"/>
+            <result property="orderState" column="order_state"/>
+            <result property="createDate" column="create_date"/>
+            <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <sql id="selectOrdersVo">
+        select order_id, user_id, dealer_shop_id, product_id, order_num, order_state, create_date, update_date
+        from orders
+    </sql>
+
+    <select id="selectOrdersList" parameterType="Orders" resultMap="OrdersResult">
+        <include refid="selectOrdersVo"/>
+        <where>
+                        <if test="userId != null ">
+                            and user_id = #{userId}
+                        </if>
+                        <if test="dealerShopId != null ">
+                            and dealer_shop_id = #{dealerShopId}
+                        </if>
+                        <if test="productId != null  and productId != ''">
+                            and product_id = #{productId}
+                        </if>
+                        <if test="orderNum != null ">
+                            and order_num = #{orderNum}
+                        </if>
+                        <if test="orderState != null ">
+                            and order_state = #{orderState}
+                        </if>
+                        <if test="createDate != null ">
+                            and create_date = #{createDate}
+                        </if>
+                        <if test="updateDate != null ">
+                            and update_date = #{updateDate}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectOrdersByOrderId" parameterType="String"
+            resultMap="OrdersResult">
+            <include refid="selectOrdersVo"/>
+            where order_id = #{orderId}
+    </select>
+
+    <insert id="insertOrders" parameterType="Orders">
+        insert into orders
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="orderId != null">order_id,
+                    </if>
+                    <if test="userId != null">user_id,
+                    </if>
+                    <if test="dealerShopId != null">dealer_shop_id,
+                    </if>
+                    <if test="productId != null">product_id,
+                    </if>
+                    <if test="orderNum != null">order_num,
+                    </if>
+                    <if test="orderState != null">order_state,
+                    </if>
+                    <if test="createDate != null">create_date,
+                    </if>
+                    <if test="updateDate != null">update_date,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="orderId != null">#{orderId},
+                    </if>
+                    <if test="userId != null">#{userId},
+                    </if>
+                    <if test="dealerShopId != null">#{dealerShopId},
+                    </if>
+                    <if test="productId != null">#{productId},
+                    </if>
+                    <if test="orderNum != null">#{orderNum},
+                    </if>
+                    <if test="orderState != null">#{orderState},
+                    </if>
+                    <if test="createDate != null">#{createDate},
+                    </if>
+                    <if test="updateDate != null">#{updateDate},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateOrders" parameterType="Orders">
+        update orders
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="userId != null">user_id =
+                        #{userId},
+                    </if>
+                    <if test="dealerShopId != null">dealer_shop_id =
+                        #{dealerShopId},
+                    </if>
+                    <if test="productId != null">product_id =
+                        #{productId},
+                    </if>
+                    <if test="orderNum != null">order_num =
+                        #{orderNum},
+                    </if>
+                    <if test="orderState != null">order_state =
+                        #{orderState},
+                    </if>
+                    <if test="createDate != null">create_date =
+                        #{createDate},
+                    </if>
+                    <if test="updateDate != null">update_date =
+                        #{updateDate},
+                    </if>
+        </trim>
+        where order_id = #{orderId}
+    </update>
+
+    <delete id="deleteOrdersByOrderId" parameterType="String">
+        delete from orders where order_id = #{orderId}
+    </delete>
+
+    <delete id="deleteOrdersByOrderIds" parameterType="String">
+        delete from orders where order_id in
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tea.web.mapper.DealerShopPictureMapper">
+
+    <resultMap type="DealerShopPicture" id="DealerShopPictureResult">
+            <result property="id" column="id"/>
+            <result property="pictureFileId" column="picture_file_id"/>
+            <result property="pictureDescription" column="picture_description"/>
+            <result property="dealerId" column="dealer_id"/>
+            <result property="pictureSort" column="picture_sort"/>
+            <result property="createDate" column="create_date"/>
+            <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <sql id="selectDealerShopPictureVo">
+        select id, picture_file_id, picture_description, dealer_id, picture_sort, create_date, update_date
+        from dealer_shop_picture
+    </sql>
+
+    <select id="selectDealerShopPictureList" parameterType="DealerShopPicture" resultMap="DealerShopPictureResult">
+        <include refid="selectDealerShopPictureVo"/>
+        <where>
+                        <if test="pictureDescription != null  and pictureDescription != ''">
+                            and picture_description like concat('%', #{pictureDescription}, '%')
+                        </if>
+                        <if test="dealerId != null and dealerId!='' ">
+                             and dealer_id = #{dealerId}
+                        </if>
+                        <if test="createDate != null ">
+                            and create_date = #{createDate}
+                        </if>
+                        <if test="updateDate != null ">
+                            and update_date = #{updateDate}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectDealerShopPictureById" parameterType="Long"
+            resultMap="DealerShopPictureResult">
+            <include refid="selectDealerShopPictureVo"/>
+            where id = #{id}
+    </select>
+
+    <insert id="insertDealerShopPicture" parameterType="DealerShopPicture" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into dealer_shop_picture
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="pictureFileId != null">picture_file_id,
+                    </if>
+                    <if test="pictureDescription != null">picture_description,
+                    </if>
+                    <if test="dealerId != null">dealer_id,
+                    </if>
+                    <if test="pictureSort != null">picture_sort,
+                    </if>
+                    <if test="createDate != null">create_date,
+                    </if>
+                    <if test="updateDate != null">update_date,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="pictureFileId != null">#{pictureFileId},
+                    </if>
+                    <if test="pictureDescription != null">#{pictureDescription},
+                    </if>
+                    <if test="dealerId != null">#{dealerId},
+                    </if>
+                    <if test="pictureSort != null">#{pictureSort},
+                    </if>
+                    <if test="createDate != null">#{createDate},
+                    </if>
+                    <if test="updateDate != null">#{updateDate},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateDealerShopPicture" parameterType="DealerShopPicture">
+        update dealer_shop_picture
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="pictureFileId != null">picture_file_id =
+                        #{pictureFileId},
+                    </if>
+                    <if test="pictureDescription != null">picture_description =
+                        #{pictureDescription},
+                    </if>
+                    <if test="dealerId != null">dealer_id =
+                        #{dealerId},
+                    </if>
+                    <if test="pictureSort != null">picture_sort =
+                        #{pictureSort},
+                    </if>
+                    <if test="createDate != null">create_date =
+                        #{createDate},
+                    </if>
+                    <if test="updateDate != null">update_date =
+                        #{updateDate},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="batchUpdateDealerShopPictureSort">
+        <foreach item="item" index="index" collection="sortList" open="" close="" separator=";">
+            UPDATE dealer_shop_picture
+            set
+            picture_sort = #{item.pictureSort}
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+
+    <delete id="deleteDealerShopPictureById" parameterType="Long">
+        delete from dealer_shop_picture where id = #{id}
+    </delete>
+
+    <delete id="deleteDealerShopPictureByIds" parameterType="String">
+        delete from dealer_shop_picture where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="batchInsertDealerShopPicture">
+        insert into dealer_shop_picture(
+            picture_file_id,
+            picture_description,
+            dealer_id,
+            picture_sort,
+            create_date,
+            update_date
+        )
+            <foreach item="item" index="index" collection="dealerShopPictureList"
+                     open="values (" separator="),(" close=")">
+                #{item.pictureFileId},
+                #{item.pictureDescription},
+                #{item.dealerId},
+                #{item.pictureSort},
+                #{item.createDate},
+                #{item.updateDate}
+            </foreach>
+    </insert>
+
+
+</mapper>

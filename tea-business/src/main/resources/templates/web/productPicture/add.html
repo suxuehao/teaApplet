@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增店铺商品对应的附件图片')"/>
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+    <style type="text/css">
+        table label.error {
+            position: inherit;
+        }
+
+        select + label.error {
+            z-index: 1;
+            right: 40px;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="main-content form-horizontal">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <div class="file-loading">
+                        <input id="multipleFile" name="files"  type="file" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "web/productPicture"
+    var shopPrefix = ctx + "web/shop";
+    var  productId = [[${productId}]]
+    //选择店铺后填充店铺信息
+    $("#dealer").change(function (){
+        if ($("#dealer").val()!==''){
+            dealerInfo();
+        }else{
+            $("#shopAddress").val('');
+            $("#shopPhone").val('');
+            $("#shopDescription").text('');
+            $("#shopCreateTime").text('');
+        }
+    })
+
+    var dealerFormData = new FormData();
+    var file = true;
+    $("#form-picture-add").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if (productId==='' || productId==null){
+            $.modal.alertWarning("商品productId获取异常!");
+            return;
+        }
+        if (file){
+            $.modal.alertWarning("选择上传图片!");
+            return;
+        }
+        dealerFormData.append('productId',productId);
+        $.ajax({
+            url: prefix + "/add",
+            type: 'post',
+            cache: false,
+            data: dealerFormData,
+            dataType: "json",
+            processData: false, // 不处理数据
+            contentType: false,// 不设置内容类型
+            success: function(result) {
+                $.operate.successCallback(result);
+                // 清空表单dealerId数据
+                if (result.code === 301){
+                    for (var pair of dealerFormData.entries()) {
+                        if (pair[0] === 'productId') {
+                            dealerFormData.delete('productId');
+                            break;
+                        }
+                    }
+                }
+            },
+            error: function() {
+                $.modal.alertError("请求失败，请重试");
+            },
+            complete: function() {
+                $('#submitButton').prop('disabled', false);
+            }
+        })
+    }
+
+
+    $(document).ready(function () {
+        // 多图上传
+        $("#multipleFile").fileinput({
+            uploadUrl: ctx + 'common/uploadByFileIds',
+            uploadAsync: false,
+            allowedFileTypes: ['image'],
+            previewFileType: ['image'],
+            maxFileCount: 10,
+            dropZoneTitle: '请选择图片...可拖拽上传（最多选择10个上传）'
+        }).on('filebatchuploadsuccess', function (event, data, previewId, index) {
+            var rsp = data.response;
+            var sysAttachments = [];
+            //获取上传成功的文件id
+            for (var i = 0; i < rsp.sysAttachments.length; i++) {
+                sysAttachments.push(rsp.sysAttachments[i].fileId);
+            }
+            dealerFormData.append('sysAttachments',sysAttachments);
+            file = false;
+            console.log(dealerFormData.get('sysAttachments'))
+        });
+    });
+
+</script>
+</body>
+</html>

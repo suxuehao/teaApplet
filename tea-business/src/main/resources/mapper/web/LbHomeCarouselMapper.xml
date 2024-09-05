@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tea.web.mapper.LbHomeCarouselMapper">
+
+    <resultMap type="LbHomeCarousel" id="LbHomeCarouselResult">
+            <result property="lbId" column="lb_id"/>
+            <result property="lbPictureName" column="lb_picture_name"/>
+            <result property="lbFileId" column="lb_file_id"/>
+            <result property="lbCreateTime" column="lb_create_time"/>
+            <result property="lbIsUse" column="lb_is_use"/>
+        <association property="sysAttachment" column="file_id" resultMap="sysAttachmentResult"></association>
+    </resultMap>
+
+    <resultMap type="SysAttachment" id="sysAttachmentResult">
+        <id property="fileId" column="file_id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="filePath" column="file_path"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="fileExt" column="file_ext"/>
+        <result property="uploadTime" column="upload_time"/>
+        <result property="sysType" column="sys_type"/>
+        <result property="state" column="state"/>
+    </resultMap>
+
+    <sql id="selectLbHomeCarouselVo">
+        select lb_id, lb_picture_name, lb_file_id, lb_create_time, lb_is_use,s.*
+        from lb_home_carousel c left join sys_attachment s on c.lb_file_id = s.file_id
+    </sql>
+
+    <select id="selectLbHomeCarouselList" parameterType="LbHomeCarousel" resultMap="LbHomeCarouselResult">
+        <include refid="selectLbHomeCarouselVo"/>
+        <where>
+                        <if test="lbPictureName != null  and lbPictureName != ''">
+                            and lb_picture_name like concat('%', #{lbPictureName}, '%')
+                        </if>
+                        <if test="lbFileId != null  and lbFileId != ''">
+                            and lb_file_id = #{lbFileId}
+                        </if>
+                        <if test="lbCreateTime != null ">
+                            and lb_create_time = #{lbCreateTime}
+                        </if>
+                        <if test="lbIsUse != null  and lbIsUse != ''">
+                            and lb_is_use = #{lbIsUse}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectLbHomeCarouselByLbId" parameterType="Long"
+            resultMap="LbHomeCarouselResult">
+            <include refid="selectLbHomeCarouselVo"/>
+            where lb_id = #{lbId}
+    </select>
+
+    <insert id="insertLbHomeCarousel" parameterType="LbHomeCarousel" useGeneratedKeys="true"
+            keyProperty="lbId">
+        insert into lb_home_carousel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="lbPictureName != null">lb_picture_name,
+                    </if>
+                    <if test="lbFileId != null">lb_file_id,
+                    </if>
+                    <if test="lbCreateTime != null">lb_create_time,
+                    </if>
+                    <if test="lbIsUse != null">lb_is_use,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="lbPictureName != null">#{lbPictureName},
+                    </if>
+                    <if test="lbFileId != null">#{lbFileId},
+                    </if>
+                    <if test="lbCreateTime != null">#{lbCreateTime},
+                    </if>
+                    <if test="lbIsUse != null">#{lbIsUse},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateLbHomeCarousel" parameterType="LbHomeCarousel">
+        update lb_home_carousel
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="lbPictureName != null">lb_picture_name =
+                        #{lbPictureName},
+                    </if>
+                    <if test="lbFileId != null">lb_file_id =
+                        #{lbFileId},
+                    </if>
+                    <if test="lbCreateTime != null">lb_create_time =
+                        #{lbCreateTime},
+                    </if>
+                    <if test="lbIsUse != null">lb_is_use =
+                        #{lbIsUse},
+                    </if>
+        </trim>
+        where lb_id = #{lbId}
+    </update>
+
+    <delete id="deleteLbHomeCarouselByLbId" parameterType="Long">
+        delete from lb_home_carousel where lb_id = #{lbId}
+    </delete>
+
+    <delete id="deleteLbHomeCarouselByLbIds" parameterType="String">
+        delete from lb_home_carousel where lb_id in
+        <foreach item="lbId" collection="array" open="(" separator="," close=")">
+            #{lbId}
+        </foreach>
+    </delete>
+
+</mapper>

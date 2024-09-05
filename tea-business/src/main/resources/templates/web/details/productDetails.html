@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('商品列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-page-size="50"
+                   data-show-custom-view="true" data-custom-view="customViewFormatter"
+                   data-show-custom-view-button="false">
+                <!--data-show-custom-view-button :false(隐藏显示列表按钮)-->
+                <!--data-show-custom-view-button :true(显示列表按钮)-->
+            </table>
+        </div>
+    </div>
+</div>
+
+<template id="profileTemplate">
+    <div class="col-sm-4">
+        <div class="contact-box">
+                <div class="col-sm-4">
+                    <div class="text-center">
+                        <img alt="image" class="img-circle m-t-xs img-responsive" src="%IMAGE%">
+                        <div class="m-t-xs font-bold">%productName%</div>
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <h3><strong><i class="fa fa-jpy"></i> %productPrice%</strong></h3>
+                    <p>库存： %productInventory%</p>
+                    <address>
+                        <strong>上架时间：%createDate%</strong><br>
+                    </address>
+                </div>
+                <div class="clearfix"></div>
+        </div>
+    </div>
+</template>
+
+<div th:include="include :: footer"></div>
+<th:block th:include="include :: bootstrap-table-custom-view-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "web/picture";
+    var datas = [[${@dict.getType('product_category')}]];
+    var shopId = [[${shopId}]];
+    $(function () {
+        var options = {
+            url: prefix + "/productDetailsData/"+shopId,
+            showSearch: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            showExport: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'productName',
+                    title: '店铺名称'
+                },
+                {
+                    field: 'productPrice',
+                    title: '商品单价'
+                },
+                {
+                    field: 'productInventory',
+                    title: '商品库存'
+                },
+                {
+                    field: 'createDate',
+                    title: '商品上架时间'
+                },
+                {
+                    field: 'params.productPicture.sysAttachments.filePath',
+                    title: '商品图片'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs" href="javascript:;"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs" href="javascript:;"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+    function customViewFormatter(data) {
+        var template = $('#profileTemplate').html()
+        var view = ''
+        $.each(data, function (i, row) {
+            debugger;
+            view += template.replace('%productPrice%', row.productPrice)
+                .replace('%IMAGE%', row.params.productPicture.sysAttachments.filePath)
+                .replace('%productName%', row.productName)
+                .replace('%createDate%', row.createDate)
+                .replace('%productInventory%', row.productInventory);
+        })
+
+        return `<div class="row mx-0">${view}</div>`
+    }
+</script>
+</body>
+</html>
