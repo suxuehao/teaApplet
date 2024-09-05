@@ -1,7 +1,7 @@
 <p align="center">
 	<img alt="logo" src="https://oscimg.oschina.net/oscnet/up-dd77653d7c9f197dd9d93684f3c8dcfbab6.png">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">RuoYi v4.7.8</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">茶云盟</h1>
 <h4 align="center">基于SpringBoot开发</h4>
 
 ## 平台简介
